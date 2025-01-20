@@ -85,6 +85,10 @@ class TPESampler(BaseSampler):
     Example:
         An example of a single-objective optimization is as follows:
 
+        .. testsetup::
+
+            import optuna
+
         .. testcode::
 
             import optuna
