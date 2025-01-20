@@ -645,7 +645,8 @@ def _split_trials(
 def _split_complete_trials(
     trials: Sequence[FrozenTrial], study: Study, n_below: int
 ) -> tuple[list[FrozenTrial], list[FrozenTrial]]:
-    n_below = min(n_below, len(trials))
+    if len(trials) <= n_below:
+        return trials, []
     if len(study.directions) <= 1:
         return _split_complete_trials_single_objective(trials, study, n_below)
     else:
