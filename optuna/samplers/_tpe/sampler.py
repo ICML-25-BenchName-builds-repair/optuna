@@ -698,7 +698,7 @@ def _split_complete_trials_multi_objective(
     if subset_size > 0:
         rank_i_lvals = lvals[nondomination_ranks == i]
         rank_i_indices = indices[nondomination_ranks == i]
-        worst_point = np.max(rank_i_lvals, axis=0)
+        worst_point = np.nanmax(np.clip(rank_i_lvals, -np.inf, 1e10), axis=0)
         reference_point = np.maximum(1.1 * worst_point, 0.9 * worst_point)
         reference_point[reference_point == 0] = EPS
         selected_indices = _solve_hssp(rank_i_lvals, rank_i_indices, subset_size, reference_point)
@@ -788,12 +788,14 @@ def _calculate_weights_below_for_multi_objective(
     elif n_below == 1:
         weights_below = np.asarray([1.0])
     else:
-        worst_point = np.max(lvals, axis=0)
+        # Add numerical stability improvements
+        worst_point = np.nanmax(np.clip(lvals, -np.inf, 1e10), axis=0)
         reference_point = np.maximum(1.1 * worst_point, 0.9 * worst_point)
         reference_point[reference_point == 0] = EPS
         hv = WFG().compute(lvals, reference_point)
         indices_mat = ~np.eye(n_below).astype(bool)
-        contributions = np.asarray(
+        # Add small epsilon to prevent division by zero
+        contributions = EPS + np.asarray(
             [hv - WFG().compute(lvals[indices_mat[i]], reference_point) for i in range(n_below)]
         )
         contributions += EPS
