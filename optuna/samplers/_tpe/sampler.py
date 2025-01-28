@@ -739,15 +739,11 @@ def _split_pruned_trials(
 
 def _get_infeasible_trial_score(trial: FrozenTrial) -> float:
     constraint = trial.system_attrs.get(_CONSTRAINTS_KEY)
+    # Handle trials without constraints by treating them as feasible with zero violation.
     if constraint is None:
-        warnings.warn(
-            f"Trial {trial.number} does not have constraint values."
-            " It will be treated as a lower priority than other trials."
-        )
-        return float("inf")
-    else:
-        # Violation values of infeasible dimensions are summed up.
-        return sum(v for v in constraint if v > 0)
+        return 0.0
+    # Violation values of infeasible dimensions are summed up.
+    return sum(v for v in constraint if v > 0)
 
 
 def _split_infeasible_trials(
