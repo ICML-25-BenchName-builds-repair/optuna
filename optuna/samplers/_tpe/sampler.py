@@ -748,6 +748,10 @@ def _get_infeasible_trial_score(trial: FrozenTrial) -> float:
     else:
         # Violation values of infeasible dimensions are summed up.
         return sum(v for v in constraint if v > 0)
+    elif isinstance(constraint, float):
+        return constraint
+    else:
+        return 0.0
 
 
 def _split_infeasible_trials(
