@@ -99,7 +99,40 @@ class TPESampler(BaseSampler):
             study = optuna.create_study(sampler=TPESampler())
             study.optimize(objective, n_trials=10)
 
+        .. testoutput::
+            [i 2023-11-01 05:06:52,260] a new study created in memory with name: no-name-ec490657-3332-406a-9faa-d6af677bbbec
+            [i 2023-11-01 05:06:52,261] trial 0 finished with value: 26.608714791257388 and parameters: {'x': -3.1583635768775924}. best is trial 0 with value: 26.608714791257388.
+            [i 2023-11-01 05:06:52,262] trial 1 finished with value: 1.5285752915058195 and parameters: {'x': 3.2363556492796963}. best is trial 1 with value: 1.5285752915058195.
+            [i 2023-11-01 05:06:52,262] trial 2 finished with value: 62.61511060819589 and parameters: {'x': -5.912971035470552}. best is trial 1 with value: 1.5285752915058195.
+            ...
+            [i 2023-11-01 05:06:52,664] trial 82 finished with value: 0.00023888961001901598 and parameters: {'x': 1.984543945845753}. best is trial 60 with value: 9.52035594438783e-05.
+
     .. note::
+        Note that the output may change slightly due to the stochastic nature of the algorithm. You
+        can use a fixed seed for testing.
+
+        .. testcode::
+            import optuna
+            from optuna.samplers import TPESampler
+
+
+            def objective(trial):
+                x = trial.suggest_float("x", -10, 10)
+                return x**2
+
+
+            sampler = optuna.samplers.TPESampler(seed=123)
+            study = optuna.create_study(sampler=sampler)
+            study.optimize(objective, n_trials=10)
+
+        .. testoutput::
+            [i ...] a new study created ...
+            [i ...] trial 0 finished with value: ...
+            ...
+            [i ...] trial 9 finished with value: ...
+
+    .. note::
+        Prior to v2.9.0, MOTPE was provided as a separate sampler.
         For `v2.9.0 <https://github.com/optuna/optuna/releases/tag/v2.9.0>`_ or later,
         MOTPESampler is deprecated and TPESampler should be used instead.
         The following code shows how you run TPESampler on a multi-objective task:
