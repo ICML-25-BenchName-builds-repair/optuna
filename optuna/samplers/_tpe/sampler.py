@@ -388,7 +388,20 @@ class TPESampler(BaseSampler):
     def sample_relative(
         self, study: Study, trial: FrozenTrial, search_space: Dict[str, BaseDistribution]
     ) -> Dict[str, Any]:
-        if self._group:
+        retry_attempts = 0
+        while retry_attempts < MAX_RETRY_ATTEMPTS:
+            try:
+                return self._sample_relative(study, trial, search_space)
+            except (ValueError, TypeError):
+                retry_attempts += 1
+                if retry_attempts == MAX_RETRY_ATTEMPTS:
+                    raise
+                _logger.info(f"Error sampling relative. Retrying ({retry_attempts}/{MAX_RETRY_ATTEMPTS}).")
+
+    def _sample_relative(
+        self, study: Study, trial: FrozenTrial, search_space: Dict[str, BaseDistribution]
+    ) -> Dict[str, Any]:
+         if self._group:
             assert self._search_space_group is not None
             params = {}
             for sub_space in self._search_space_group.search_spaces:
@@ -417,6 +430,23 @@ class TPESampler(BaseSampler):
         return self._sample(study, trial, search_space)
 
     def sample_independent(
+        self,
+        study: Study,
+        trial: FrozenTrial,
+        param_name: str,
+        param_distribution: BaseDistribution,
+    ) -> Any:
+        retry_attempts = 0
+        while retry_attempts < MAX_RETRY_ATTEMPTS:
+            try:
+                return self._sample_independent(study, trial, param_name, param_distribution)
+            except (ValueError, TypeError):
+                retry_attempts += 1
+                if retry_attempts == MAX_RETRY_ATTEMPTS:
+                    raise
+                _logger.info(f"Error sampling {param_name}. Retrying ({retry_attempts}/{MAX_RETRY_ATTEMPTS}).")
+
+    def _sample_independent(
         self,
         study: Study,
         trial: FrozenTrial,
