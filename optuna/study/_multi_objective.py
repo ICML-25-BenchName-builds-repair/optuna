@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import List, Optional, Sequence
+from typing import List
+from typing import Optional
+from typing import Sequence
 
 import numpy as np
 
 import optuna
 from optuna.study._study_direction import StudyDirection
 from optuna.trial import FrozenTrial, TrialState
-
 
 def _get_pareto_front_trials_2d(
     trials: Sequence[FrozenTrial], directions: Sequence[StudyDirection]
@@ -38,7 +39,6 @@ def _get_pareto_front_trials_2d(
     pareto_front.sort(key=lambda trial: trial.number)
     return pareto_front
 
-
 def _get_pareto_front_trials_nd(
     trials: Sequence[FrozenTrial], directions: Sequence[StudyDirection]
 ) -> List[FrozenTrial]:
@@ -58,7 +58,6 @@ def _get_pareto_front_trials_nd(
 
     return pareto_front
 
-
 def _get_pareto_front_trials_by_trials(
     trials: Sequence[FrozenTrial], directions: Sequence[StudyDirection]
 ) -> List[FrozenTrial]:
@@ -66,10 +65,8 @@ def _get_pareto_front_trials_by_trials(
         return _get_pareto_front_trials_2d(trials, directions)  # Log-linear in number of trials.
     return _get_pareto_front_trials_nd(trials, directions)  # Quadratic in number of trials.
 
-
 def _get_pareto_front_trials(study: "optuna.study.Study") -> List[FrozenTrial]:
     return _get_pareto_front_trials_by_trials(study.trials, study.directions)
-
 
 def _fast_non_dominated_sort(
     objective_values: np.ndarray,
@@ -128,7 +125,6 @@ def _fast_non_dominated_sort(
             dominated_count[domination_map[non_dominated_idx]] -= 1
     return ranks
 
-
 def _dominates(
     trial0: FrozenTrial, trial1: FrozenTrial, directions: Sequence[StudyDirection]
 ) -> bool:
@@ -159,7 +155,6 @@ def _dominates(
         return False
 
     return all(v0 <= v1 for v0, v1 in zip(normalized_values0, normalized_values1))
-
 
 def _normalize_value(value: Optional[float], direction: StudyDirection) -> float:
     if value is None:
