@@ -365,6 +365,9 @@ class TPESampler(BaseSampler):
         if not self._multivariate:
             return {}
 
+        if len(trials) == 0:
+            return {}
+
         search_space: Dict[str, BaseDistribution] = {}
 
         if self._group:
@@ -803,3 +806,7 @@ def _calculate_weights_below_for_multi_objective(
     weights_below_all = np.full(len(below_trials), EPS)
     weights_below_all[feasible_mask] = weights_below
     return weights_below_all
+
+def _is_trial_infeasible(trial: FrozenTrial) -> bool:
+    constraint = trial.system_attrs.get(_CONSTRAINTS_KEY)
+    return constraint is not None and any(v > 0 for v in constraint)
