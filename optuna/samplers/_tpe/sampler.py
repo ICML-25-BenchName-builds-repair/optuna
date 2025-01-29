@@ -724,7 +724,7 @@ def _get_pruned_trial_score(trial: FrozenTrial, study: Study) -> tuple[float, fl
         else:
             return -step, -intermediate_value
     else:
-        return 1, 0.0
+        return float("inf"), 0.0
 
 
 def _split_pruned_trials(
