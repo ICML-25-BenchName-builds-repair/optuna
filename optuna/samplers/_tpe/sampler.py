@@ -776,6 +776,7 @@ def _calculate_weights_below_for_multi_objective(
             if direction == StudyDirection.MINIMIZE:
                 values.append(value)
             else:
+
                 values.append(-value)
         loss_vals.append(values)
     lvals = np.asarray(loss_vals, dtype=float)
