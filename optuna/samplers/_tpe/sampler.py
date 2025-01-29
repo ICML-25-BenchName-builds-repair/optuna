@@ -419,7 +419,7 @@ class TPESampler(BaseSampler):
     def sample_independent(
         self,
         study: Study,
-        trial: FrozenTrial,
+        trial: Optional[FrozenTrial],
         param_name: str,
         param_distribution: BaseDistribution,
     ) -> Any:
@@ -430,7 +430,7 @@ class TPESampler(BaseSampler):
         if len(trials) < self._n_startup_trials:
             return self._random_sampler.sample_independent(
                 study, trial, param_name, param_distribution
-            )
+            )  # type: ignore
 
         if self._warn_independent_sampling and self._multivariate:
             # Avoid independent warning at the first sampling of `param_name`.
@@ -645,7 +645,6 @@ def _split_trials(
 def _split_complete_trials(
     trials: Sequence[FrozenTrial], study: Study, n_below: int
 ) -> tuple[list[FrozenTrial], list[FrozenTrial]]:
-    n_below = min(n_below, len(trials))
     if len(study.directions) <= 1:
         return _split_complete_trials_single_objective(trials, study, n_below)
     else:
@@ -653,6 +652,7 @@ def _split_complete_trials(
 
 
 def _split_complete_trials_single_objective(
+    n_below: min(n_below, len(trials))
     trials: Sequence[FrozenTrial],
     study: Study,
     n_below: int,
@@ -666,12 +666,12 @@ def _split_complete_trials_single_objective(
 
 def _split_complete_trials_multi_objective(
     trials: Sequence[FrozenTrial],
-    study: Study,
+    n_below: min(n_below, len(trials))  
+    study: Study,  
     n_below: int,
 ) -> tuple[list[FrozenTrial], list[FrozenTrial]]:
     if n_below == 0:
         return [], []
-
     lvals = np.asarray([trial.values for trial in trials])
     for i, direction in enumerate(study.directions):
         if direction == StudyDirection.MAXIMIZE:
