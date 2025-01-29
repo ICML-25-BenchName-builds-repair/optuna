@@ -671,23 +671,29 @@ def _split_complete_trials_multi_objective(
 ) -> tuple[list[FrozenTrial], list[FrozenTrial]]:
     if n_below == 0:
         return [], []
+        
+    if len(trials) == 0:
+        return [], []
 
     lvals = np.asarray([trial.values for trial in trials])
     for i, direction in enumerate(study.directions):
         if direction == StudyDirection.MAXIMIZE:
             lvals[:, i] *= -1
 
-    # Solving HSSP for variables number of times is a waste of time.
     nondomination_ranks = _calculate_nondomination_rank(lvals, n_below)
     assert 0 <= n_below <= len(lvals)
 
     indices = np.array(range(len(lvals)))
-    indices_below = np.empty(n_below, dtype=int)
+    indices_below = np.zeros(n_below, dtype=int)
 
     # Nondomination rank-based selection
     i = 0
     last_idx = 0
-    while last_idx < n_below and last_idx + sum(nondomination_ranks == i) <= n_below:
+    while (
+        last_idx < n_below 
+        and i < max(nondomination_ranks) + 1
+        and last_idx + sum(nondomination_ranks == i) <= n_below
+    ):
         length = indices[nondomination_ranks == i].shape[0]
         indices_below[last_idx : last_idx + length] = indices[nondomination_ranks == i]
         last_idx += length
@@ -695,8 +701,11 @@ def _split_complete_trials_multi_objective(
 
     # Hypervolume subset selection problem (HSSP)-based selection
     subset_size = n_below - last_idx
-    if subset_size > 0:
+    if subset_size > 0 and i <= max(nondomination_ranks):
         rank_i_lvals = lvals[nondomination_ranks == i]
+        if len(rank_i_lvals) == 0:
+            return below_trials, above_trials
+            
         rank_i_indices = indices[nondomination_ranks == i]
         worst_point = np.max(rank_i_lvals, axis=0)
         reference_point = np.maximum(1.1 * worst_point, 0.9 * worst_point)
