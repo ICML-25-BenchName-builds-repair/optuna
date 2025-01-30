@@ -698,8 +698,7 @@ def _split_complete_trials_multi_objective(
     if subset_size > 0:
         rank_i_lvals = lvals[nondomination_ranks == i]
         rank_i_indices = indices[nondomination_ranks == i]
-        worst_point = np.max(rank_i_lvals, axis=0)
-        reference_point = np.maximum(1.1 * worst_point, 0.9 * worst_point)
+        reference_point = np.max(rank_i_lvals, axis=0) + EPS
         reference_point[reference_point == 0] = EPS
         selected_indices = _solve_hssp(rank_i_lvals, rank_i_indices, subset_size, reference_point)
         indices_below[last_idx:] = selected_indices
