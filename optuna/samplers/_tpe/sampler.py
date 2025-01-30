@@ -523,7 +523,7 @@ class TPESampler(BaseSampler):
                     "But (samples.size, score.size) = ({}, {})".format(sample_size, score.size)
                 )
             best = np.argmax(score)
-            return {k: v[best].item() for k, v in samples.items()}
+            return {k: v[best].item() for k, v in samples.items()}  
         else:
             raise ValueError(
                 "The size of 'samples' should be more than 0."
