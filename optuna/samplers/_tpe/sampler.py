@@ -119,7 +119,7 @@ class TPESampler(BaseSampler):
 
             # We minimize the first objective and the second objective.
             sampler = optuna.samplers.TPESampler()
-            study = optuna.create_study(directions=["minimize", "maximize"], sampler=sampler)
+            study = optuna.create_study(directions=["minimize", "minimize"], sampler=sampler)
             study.optimize(objective, n_trials=100)
 
     Args:
