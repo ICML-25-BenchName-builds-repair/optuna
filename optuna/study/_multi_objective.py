@@ -6,7 +6,7 @@ from typing import List, Optional, Sequence
 import numpy as np
 
 import optuna
-from optuna.study._study_direction import StudyDirection
+from optuna.study._study_direction import StudyDirection 
 from optuna.trial import FrozenTrial, TrialState
 
 
