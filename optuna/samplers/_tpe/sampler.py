@@ -758,6 +758,27 @@ def _split_infeasible_trials(
     return sorted_trials[:n_below], sorted_trials[n_below:]
 
 
+def _get_infeasible_trial_score(trial: FrozenTrial) -> float:
+    constraint = trial.system_attrs.get(_CONSTRAINTS_KEY)
+    if constraint is None:
+        warnings.warn(
+            f"Trial {trial.number} does not have constraint values."
+            " It will be treated as a lower priority than other trials."
+        )
+        return float("inf")
+    else:
+        # Violation values of infeasible dimensions are summed up.
+        return sum(v for v in constraint if v > 0)
+
+
+def _split_infeasible_trials(
+    trials: Sequence[FrozenTrial], n_below: int
+) -> tuple[list[FrozenTrial], list[FrozenTrial]]:
+    n_below = min(n_below, len(trials))
+    sorted_trials = sorted(trials, key=_get_infeasible_trial_score)
+    return sorted_trials[:n_below], sorted_trials[n_below:]
+
+
 def _calculate_weights_below_for_multi_objective(
     study: Study,
     below_trials: list[FrozenTrial],
