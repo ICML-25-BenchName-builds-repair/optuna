@@ -572,7 +572,7 @@ class TPESampler(BaseSampler):
             "gamma": hyperopt_default_gamma,
             "weights": default_weights,
         }
-
+    
     def before_trial(self, study: Study, trial: FrozenTrial) -> None:
         self._random_sampler.before_trial(study, trial)
 
@@ -584,9 +584,10 @@ class TPESampler(BaseSampler):
         values: Optional[Sequence[float]],
     ) -> None:
         assert state in [TrialState.COMPLETE, TrialState.FAIL, TrialState.PRUNED]
-        if self._constraints_func is not None:
-            _process_constraints_after_trial(self._constraints_func, study, trial, state)
-        self._random_sampler.after_trial(study, trial, state, values)
+        if state != TrialState.FAIL:
+            if self._constraints_func is not None:
+                _process_constraints_after_trial(self._constraints_func, study, trial, state)
+            self._random_sampler.after_trial(study, trial, state, values)
 
 
 def _calculate_nondomination_rank(loss_vals: np.ndarray, n_below: int) -> np.ndarray:
@@ -751,7 +752,8 @@ def _get_infeasible_trial_score(trial: FrozenTrial) -> float:
 
 
 def _split_infeasible_trials(
-    trials: Sequence[FrozenTrial], n_below: int
+    trials: Sequence[FrozenTrial],
+    n_below: int,
 ) -> tuple[list[FrozenTrial], list[FrozenTrial]]:
     n_below = min(n_below, len(trials))
     sorted_trials = sorted(trials, key=_get_infeasible_trial_score)
