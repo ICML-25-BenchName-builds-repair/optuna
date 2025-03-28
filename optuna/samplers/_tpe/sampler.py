@@ -287,7 +287,7 @@ class TPESampler(BaseSampler):
         constant_liar: bool = False,
         constraints_func: Optional[Callable[[FrozenTrial], Sequence[float]]] = None,
         categorical_distance_func: Optional[
-            dict[str, Callable[[CategoricalChoiceType, CategoricalChoiceType], float]]
+            Dict[str, Callable[[CategoricalChoiceType, CategoricalChoiceType], float]]
         ] = None,
     ) -> None:
         self._parzen_estimator_parameters = _ParzenEstimatorParameters(
