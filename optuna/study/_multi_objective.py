@@ -40,8 +40,8 @@ def _get_pareto_front_trials_2d(
 
 
 def _get_pareto_front_trials_nd(
-    trials: Sequence[FrozenTrial], directions: Sequence[StudyDirection]
-) -> List[FrozenTrial]:
+    trials: sequence[FrozenTrial], directions: sequence[StudyDirection]
+) -> list[FrozenTrial]:
     pareto_front = []
     trials = [t for t in trials if t.state == TrialState.COMPLETE]
 
@@ -60,14 +60,15 @@ def _get_pareto_front_trials_nd(
 
 
 def _get_pareto_front_trials_by_trials(
-    trials: Sequence[FrozenTrial], directions: Sequence[StudyDirection]
-) -> List[FrozenTrial]:
+    trials: sequence[FrozenTrial], directions: sequence[StudyDirection]
+) -> list[FrozenTrial]:
     if len(directions) == 2:
         return _get_pareto_front_trials_2d(trials, directions)  # Log-linear in number of trials.
     return _get_pareto_front_trials_nd(trials, directions)  # Quadratic in number of trials.
 
 
 def _get_pareto_front_trials(study: "optuna.study.Study") -> List[FrozenTrial]:
+def _get_pareto_front_trials(study: "optuna.study.Study") -> list[FrozenTrial]:
     return _get_pareto_front_trials_by_trials(study.trials, study.directions)
 
 
@@ -161,7 +162,7 @@ def _dominates(
     return all(v0 <= v1 for v0, v1 in zip(normalized_values0, normalized_values1))
 
 
-def _normalize_value(value: Optional[float], direction: StudyDirection) -> float:
+def _normalize_value(value: optional[float], direction: StudyDirection) -> float:
     if value is None:
         value = float("inf")
 
